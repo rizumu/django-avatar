@@ -3,6 +3,11 @@ import os
 import hashlib
 from PIL import Image
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 from django.db import models
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -92,7 +97,8 @@ class Avatar(models.Model):
         # invalidate the cache of the thumbnail with the given size first
         invalidate_cache(self.user, size)
         try:
-            orig = self.avatar.storage.open(self.avatar.name, 'rb')
+            #orig = self.avatar.storage.open(self.avatar.name, 'rb')
+            orig = StringIO(self.avatar.storage.open(self.avatar.name, 'rb').read())
             image = Image.open(orig)
             quality = quality or settings.AVATAR_THUMB_QUALITY
             w, h = image.size
